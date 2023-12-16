@@ -24,18 +24,14 @@ struct VStackLayout: Layout {
         let offsetXStep = (bounds.width - squareSize) / CGFloat(itemCount - 1)
         let totalSpacing = spacing * CGFloat(itemCount - 1)
         let availableWidth = bounds.width - totalSpacing
-
-
         let itemWidth = availableWidth / CGFloat(itemCount)
             for index in subviews.indices {
                 if isAnim {
-
                     let offsetX = offsetXStep * CGFloat(index)
-                    let offsetY = bounds.height - squareSize - (squareSize * CGFloat(index))
+                    let offsetY = squareSize * CGFloat(index)
                     let frame = CGRect(x: offsetX, y: bounds.height - offsetY, width: squareSize, height: squareSize)
                     subviews[index].place(at: frame.origin, anchor: .leading, proposal: ProposedViewSize(frame.size))
                 } else {
-
                     let offsetX = (itemWidth + spacing) * CGFloat(index)
                     let frame = CGRect(x: offsetX, y: bounds.height / 2, width: itemWidth, height: itemWidth)
                     subviews[index].place(at: frame.origin, anchor: .topLeading, proposal: ProposedViewSize(frame.size))
