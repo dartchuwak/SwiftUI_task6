@@ -8,10 +8,7 @@
 
 import SwiftUI
 
-struct VStackLayout: Layout {
-    let itemCount: Int
-    @Binding var isAnim: Bool
-    let spacing: CGFloat
+struct MyLayout: Layout {
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
 
@@ -19,23 +16,14 @@ struct VStackLayout: Layout {
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-
+        let itemCount = subviews.count
         let squareSize = bounds.height / CGFloat(itemCount)
         let offsetXStep = (bounds.width - squareSize) / CGFloat(itemCount - 1)
-        let totalSpacing = spacing * CGFloat(itemCount - 1)
-        let availableWidth = bounds.width - totalSpacing
-        let itemWidth = availableWidth / CGFloat(itemCount)
             for index in subviews.indices {
-                if isAnim {
                     let offsetX = offsetXStep * CGFloat(index)
                     let offsetY = squareSize * CGFloat(index)
-                    let frame = CGRect(x: offsetX, y: bounds.height - offsetY, width: squareSize, height: squareSize)
-                    subviews[index].place(at: frame.origin, anchor: .leading, proposal: ProposedViewSize(frame.size))
-                } else {
-                    let offsetX = (itemWidth + spacing) * CGFloat(index)
-                    let frame = CGRect(x: offsetX, y: bounds.height / 2, width: itemWidth, height: itemWidth)
-                    subviews[index].place(at: frame.origin, anchor: .topLeading, proposal: ProposedViewSize(frame.size))
-            }
+                let frame = CGRect(x: offsetX + bounds.minX, y: bounds.maxY - squareSize - offsetY, width: squareSize, height: squareSize)
+                    subviews[index].place(at: frame.origin,proposal: ProposedViewSize(frame.size))
         }
     }
 }
@@ -43,14 +31,15 @@ struct VStackLayout: Layout {
 struct ContentView: View {
     @State var  isAnim = false
     var body: some View {
-    VStack {
-        VStackLayout(itemCount: 7, isAnim: $isAnim, spacing: 10) {
+        let layout = isAnim ? AnyLayout(MyLayout()) : AnyLayout(HStackLayout())
+        layout {
             ForEach(0..<7, id: \.self) { _ in
                 Rectangle()
                     .fill(Color.blue)
+                    .cornerRadius(15)
+                    .aspectRatio(1,contentMode: .fit)
             }
         }
-    }
         .onTapGesture {
             withAnimation {
                 isAnim.toggle()
